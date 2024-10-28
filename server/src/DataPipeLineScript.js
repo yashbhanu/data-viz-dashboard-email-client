@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-import { connectToMongo } from "./dbConn";
+import { connectToMongo } from "../src/dbConn.js";
 import fs from 'fs';
 import csv from 'csv-parser';
-import FeatureData from "./models/FeatureData";
+import FeatureData from "../src/models/FeatureData.js";
 import path from "path";
 
 (async () => {
