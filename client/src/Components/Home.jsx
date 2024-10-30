@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
 import Loader from "./Loader";
+import BarChart from "./BarChart";
+import LineChart from "./LineChart";
 
 const Home = () => {
   const [filters, setFilters] = useState({
@@ -13,7 +15,17 @@ const Home = () => {
   const [dateRange, setDateRange] = useState([]);
   const [error, setError] = useState("");
   const [loading, setloading] = useState(false);
-
+  const barChartLabels = ["A", "B", "C", "D", "E", "F"];
+  const [barChartData, setbarChartData] = useState([]);
+  const [lineChartData, setlineChartData] = useState({
+    A: [],
+    B: [],
+    C: [],
+    D: [],
+    E: [],
+    F: [],
+  });
+  const [lineChartCategoryData, setlineChartCategoryData] = useState([])
   const handleDateChange = (range) => {
     setDateRange(range);
     setError("");
@@ -57,21 +69,62 @@ const Home = () => {
         body: JSON.stringify(filter),
       });
       const data = await res.json();
-      console.log({ data });
-      console.log({ startDate, endDate });
+      generateChartsData(data);
     } catch (error) {
     } finally {
       setloading(false);
     }
   };
 
+  const generateChartsData = (data) => {
+    const arr = new Array(barChartLabels.length).fill(0);
+    if (data?.length > 0) {
+      for (const feature of data) {
+        arr[0] += feature["A"];
+        arr[1] += feature["B"];
+        arr[2] += feature["C"];
+        arr[3] += feature["D"];
+        arr[4] += feature["E"];
+        arr[5] += feature["F"];
+      }
+
+      const lineChartData = data.reduce((acc, item) => {
+        const day = item.Day;
+        if (!acc[day]) {
+          acc[day] = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0 };
+        }
+        acc[day].A += item.A;
+        acc[day].B += item.B;
+        acc[day].C += item.C;
+        acc[day].D += item.D;
+        acc[day].E += item.E;
+        acc[day].F += item.F;
+        return acc;
+      }, {});
+
+      setlineChartData({
+        A: Object.values(lineChartData).map((day) => day.A),
+        B: Object.values(lineChartData).map((day) => day.B),
+        C: Object.values(lineChartData).map((day) => day.C),
+        D: Object.values(lineChartData).map((day) => day.D),
+        E: Object.values(lineChartData).map((day) => day.E),
+        F: Object.values(lineChartData).map((day) => day.F),
+      });
+      setbarChartData(arr);
+    }
+  };
+
+  const selectCategory = (categoryName) => {
+    setlineChartCategoryData(lineChartData[categoryName])
+  }
+
   useEffect(() => {
-    console.log({ dateRange, filters });
-  }, [dateRange, filters]);
+    console.log({ barChartData, lineChartData });
+  }, [barChartData, lineChartData]);
 
   return (
     <>
-      <div className="flex justify-center w-full mt-6">
+      <div className="flex flex-col items-center w-full mt-6">
         {loading && <Loader />}
         <form
           onSubmit={handleSubmit}
@@ -149,6 +202,21 @@ const Home = () => {
             </button>
           </div>
         </form>
+        <div className="flex mt-12 h-[300px] items-center gap-4 justify-center w-full">
+          <BarChart
+            chartData={barChartData}
+            labels={barChartLabels}
+            title={"Features"}
+            legend={"Total Time Spent"}
+            selectCategory={selectCategory}
+          />
+          <LineChart
+            chartData={lineChartCategoryData}
+            labels={barChartLabels}
+            title={"Features"}
+            legend={"Total Time Spent"}
+          />
+        </div>
       </div>
     </>
   );
