@@ -7,7 +7,6 @@ export function authorize(req, res, next) {
                 msg: "Token not found",
             });
         }
-        token = token.split(" ")[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded.user;
         next();

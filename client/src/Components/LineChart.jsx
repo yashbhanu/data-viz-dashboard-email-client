@@ -37,7 +37,7 @@ const LineChart = ({chartData, labels, title, legend}) => {
       },
     };
   
-    return <Line className='w-1/2' data={data} options={options} />;
+    return <Line className="w-[300px]" data={data} options={options} />;
   }
   
   export default LineChart;

@@ -52,6 +52,11 @@ const BarChart = ({ labels, title, legend, chartData, selectCategory }) => {
     indexAxis: "y",
     plugins: {
       legend: {
+        onHover: (e) => {
+          if(e?.target?.style?.cursor) {
+            e.target.style.cursor = 'pointer';
+          }
+        },
         position: "top",
       },
       title: {
@@ -66,7 +71,7 @@ const BarChart = ({ labels, title, legend, chartData, selectCategory }) => {
     },
   };
 
-  return <Bar className="w-1/2" ref={chartRef} data={data} options={options} />;
+  return <Bar className="w-[300px]" ref={chartRef} data={data} options={options} />;
 };
 
 export default BarChart;

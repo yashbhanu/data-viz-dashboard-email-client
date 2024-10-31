@@ -16,7 +16,7 @@ featureRouter.route("/").post(async (req, res) => {
       ...(age && { Age: age }),
       ...(gender && { Gender: gender }),
     };
-    const results = await FeatureData.find(filter);
+    const results = await FeatureData.find(filter).sort({Day : 1});
     res.status(200).json(results)
   } catch (error) {
     res.status(500).json({

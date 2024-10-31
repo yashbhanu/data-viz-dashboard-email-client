@@ -4,18 +4,21 @@ import "rsuite/dist/rsuite.min.css";
 import Loader from "./Loader";
 import BarChart from "./BarChart";
 import LineChart from "./LineChart";
+import { copyToClipBoard, generateChartsData } from "../helper";
+import { toast } from "react-toastify";
+import { useCookies } from "react-cookie";
 
 const Home = () => {
+  const [cookies, setCookie, removeCookie] = useCookies(['age', 'gender', 'startDate', 'endDate']);
   const [filters, setFilters] = useState({
-    startDate: [],
-    endDate: "",
-    gender: "",
-    age: "",
+    gender: cookies.gender || "",
+    age: cookies.age || "",
   });
-  const [dateRange, setDateRange] = useState([]);
+  const [dateRange, setDateRange] = useState(cookies.startDate && cookies.endDate ? [new Date(cookies.startDate), new Date(cookies.endDate)] : []);
   const [error, setError] = useState("");
   const [loading, setloading] = useState(false);
   const barChartLabels = ["A", "B", "C", "D", "E", "F"];
+  const [lineChartLabels, setlineChartLabels] = useState([]);
   const [barChartData, setbarChartData] = useState([]);
   const [lineChartData, setlineChartData] = useState({
     A: [],
@@ -25,9 +28,13 @@ const Home = () => {
     E: [],
     F: [],
   });
-  const [lineChartCategoryData, setlineChartCategoryData] = useState([])
+  const [lineChartCategoryData, setlineChartCategoryData] = useState([]);
+  const [currentCategory, setcurrentCategory] = useState("");
+  const [showChart, setshowChart] = useState(false);
   const handleDateChange = (range) => {
     setDateRange(range);
+    setCookie('startDate', formatDate(range[0]))
+    setCookie('endDate', formatDate(range[1]))
     setError("");
   };
 
@@ -36,6 +43,18 @@ const Home = () => {
       ...filters,
       [e.target.name]: e.target.value,
     });
+    setCookie(e.target.name, e.target.value);
+  };
+
+  const clearAllCookies = () => {
+    Object.keys(cookies).forEach((cookieName) => {
+      removeCookie(cookieName, { path: '/' });
+    });
+    setFilters({
+      gender: "",
+      age: "",
+    })
+    setDateRange([])
   };
 
   const formatDate = (date) => {
@@ -69,58 +88,36 @@ const Home = () => {
         body: JSON.stringify(filter),
       });
       const data = await res.json();
-      generateChartsData(data);
+      if(!data?.length) {
+        toast.error("No Data found")
+        return
+      }
+      renderChartData(data);
     } catch (error) {
     } finally {
       setloading(false);
     }
   };
 
-  const generateChartsData = (data) => {
-    const arr = new Array(barChartLabels.length).fill(0);
-    if (data?.length > 0) {
-      for (const feature of data) {
-        arr[0] += feature["A"];
-        arr[1] += feature["B"];
-        arr[2] += feature["C"];
-        arr[3] += feature["D"];
-        arr[4] += feature["E"];
-        arr[5] += feature["F"];
-      }
-
-      const lineChartData = data.reduce((acc, item) => {
-        const day = item.Day;
-        if (!acc[day]) {
-          acc[day] = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0 };
-        }
-        acc[day].A += item.A;
-        acc[day].B += item.B;
-        acc[day].C += item.C;
-        acc[day].D += item.D;
-        acc[day].E += item.E;
-        acc[day].F += item.F;
-        return acc;
-      }, {});
-
-      setlineChartData({
-        A: Object.values(lineChartData).map((day) => day.A),
-        B: Object.values(lineChartData).map((day) => day.B),
-        C: Object.values(lineChartData).map((day) => day.C),
-        D: Object.values(lineChartData).map((day) => day.D),
-        E: Object.values(lineChartData).map((day) => day.E),
-        F: Object.values(lineChartData).map((day) => day.F),
-      });
-      setbarChartData(arr);
-    }
+  const renderChartData = (data) => {
+    const { formatLineChartData, arr, lineChartLabels } = generateChartsData(
+      data,
+      barChartLabels
+    );
+    setlineChartLabels(lineChartLabels);
+    setlineChartData(formatLineChartData);
+    setbarChartData(arr);
+    setshowChart(true);
   };
 
   const selectCategory = (categoryName) => {
-    setlineChartCategoryData(lineChartData[categoryName])
-  }
+    setlineChartCategoryData(lineChartData[categoryName]);
+    setcurrentCategory(categoryName);
+  };
 
   useEffect(() => {
-    console.log({ barChartData, lineChartData });
-  }, [barChartData, lineChartData]);
+    console.log({ filters });
+  }, [filters]);
 
   return (
     <>
@@ -156,10 +153,11 @@ const Home = () => {
               <select
                 name="gender"
                 id="gender"
+                value={filters.gender}
                 onChange={handleChange}
                 className="border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
               >
-                <option selected disabled>
+                <option value="" disabled>
                   Select Gender
                 </option>
                 <option value="Male">Male</option>
@@ -176,10 +174,11 @@ const Home = () => {
               <select
                 name="age"
                 id="age"
+                value={filters.age}
                 onChange={handleChange}
                 className="border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
               >
-                <option selected disabled>
+                <option value="" disabled>
                   Select Age
                 </option>
                 <option value="15-25">15-25</option>
@@ -196,27 +195,47 @@ const Home = () => {
             </button>
             <button
               type="button"
+              onClick={clearAllCookies}
               className="px-4 bg-gray-600 py-1 text-white font-medium rounded text-center"
             >
               Reset
             </button>
+            {showChart && (
+              <button
+                onClick={() => {
+                  const link = `http://localhost:3000/view-chart?startDate=${formatDate(
+                    dateRange[0]
+                  )}&endDate=${formatDate(dateRange[1])}&age=${
+                    filters.age
+                  }&gender=${filters.gender}&feature=${currentCategory}`;
+                  copyToClipBoard(link);
+                  toast.success("Link Copied Successfully")
+                }}
+                type="button"
+                className="px-4 bg-sky-600 py-1 text-white font-medium rounded text-center"
+              >
+                Share Chart
+              </button>
+            )}
           </div>
         </form>
-        <div className="flex mt-12 h-[300px] items-center gap-4 justify-center w-full">
-          <BarChart
-            chartData={barChartData}
-            labels={barChartLabels}
-            title={"Features"}
-            legend={"Total Time Spent"}
-            selectCategory={selectCategory}
-          />
-          <LineChart
-            chartData={lineChartCategoryData}
-            labels={barChartLabels}
-            title={"Features"}
-            legend={"Total Time Spent"}
-          />
-        </div>
+        {showChart && (
+          <div className="flex mt-12 h-[300px] items-center gap-8 justify-center w-full">
+            <BarChart
+              chartData={barChartData}
+              labels={barChartLabels}
+              title={"Features"}
+              legend={"Total Time Spent"}
+              selectCategory={selectCategory}
+            />
+            <LineChart
+              chartData={lineChartCategoryData}
+              labels={lineChartLabels}
+              title={`Feature ${currentCategory}`}
+              legend={"Total Time Spent on Day"}
+            />
+          </div>
+        )}
       </div>
     </>
   );
