@@ -3,7 +3,8 @@ export const generateChartsData = (data, barChartLabels) => {
     const arr = new Array(barChartLabels.length).fill(0);
     if (data?.length > 0) {
       for (const feature of data) {
-        lineChartLabelSet.add(formatDate(new Date(feature["Day"])))
+        const date = new Date(feature["Day"]).toISOString()
+        lineChartLabelSet.add(formatDateForLabels(date))
         arr[0] += feature["A"];
         arr[1] += feature["B"];
         arr[2] += feature["C"];
@@ -46,6 +47,14 @@ export const generateChartsData = (data, barChartLabels) => {
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}/${month}/${day}`;
+  };
+
+  export const formatDateForLabels = (dateString) => {
+    const date = new Date(dateString);
+    const formattedDate = `${date.getUTCDate()}/${
+      date.getUTCMonth() + 1
+    }/${date.getUTCFullYear()}`;
+    return formattedDate;
   };
 
   export const copyToClipBoard = (text) => {

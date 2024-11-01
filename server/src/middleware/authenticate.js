@@ -1,6 +1,8 @@
+import jwt from 'jsonwebtoken'
+
 export function authorize(req, res, next) {
     try {
-        let token = req.get("authorization").split(" ")[1];
+        let token = req.get("authorization")?.split(" ")[1];
         if (!token) {
             return res.status(404).json({
                 success: false,

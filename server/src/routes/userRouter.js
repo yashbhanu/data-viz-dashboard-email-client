@@ -1,5 +1,5 @@
 import express from "express";
-import User from "../models/User";
+import User from "../models/User.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 const userRouter = express.Router();
@@ -22,7 +22,9 @@ userRouter.route("/signup").post(async (req, res) => {
       email: email,
       password: encryptPass,
     });
-
+    user = user.toObject()
+    delete user.password;
+    console.log({user})
     const authToken = jwt.sign({user}, process.env.JWT_SECRET);
     res.status(201).json({authToken})
 
@@ -39,7 +41,7 @@ userRouter.route("/signin").post(async (req, res) => {
     if(!email || !password) {
       throw new Error('Enter Email & Password & Name');
     }
-    let user = await User.findOne({email: email});
+    let user = await User.findOne({email: email}).lean();
     if(!user){
       throw new Error("Incorrect Email or Password");
     }
@@ -48,9 +50,9 @@ userRouter.route("/signin").post(async (req, res) => {
     if(!passwordCompare) {
       throw new Error("Incorrect Email or Password");
     }
-
+    delete user.password;
     const authToken = jwt.sign({user}, process.env.JWT_SECRET);
-    res.status(201).json({authToken})
+    res.status(200).json({authToken})
   } catch (error) {
     res.status(500).json({
       message: error.message || "Bad Request. Please Try Again",

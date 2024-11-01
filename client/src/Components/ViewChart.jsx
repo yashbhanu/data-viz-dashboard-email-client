@@ -4,6 +4,7 @@ import BarChart from "./BarChart";
 import LineChart from "./LineChart";
 import Loader from "./Loader";
 import { generateChartsData } from "../helper";
+import { toast } from "react-toastify";
 
 const ViewChart = () => {
   const location = useLocation();
@@ -14,7 +15,6 @@ const ViewChart = () => {
   const age = queryParams.get("age");
   const gender = queryParams.get("gender");
   const feature = queryParams.get("feature");
-  console.log({ startDate, endDate, age, gender, feature });
   const [loading, setloading] = useState(false);
   const barChartLabels = ["A", "B", "C", "D", "E", "F"];
   const [lineChartLabels, setlineChartLabels] = useState([]);
@@ -30,6 +30,7 @@ const ViewChart = () => {
   const [lineChartCategoryData, setlineChartCategoryData] = useState([]);
   const [currentCategory, setcurrentCategory] = useState(feature || "");
   const [showChart, setshowChart] = useState(false);
+  const token = localStorage.getItem("token")
 
   const handleSubmit = async () => {
     setloading(true);
@@ -43,16 +44,22 @@ const ViewChart = () => {
         ...(gender && { gender: gender }),
         ...(age && { age: age }),
       };
-      const res = await fetch(`http://localhost:4000/api/feature/`, {
+      const res = await fetch(`${process.env.REACT_APP_SERVER_URL}api/feature/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization" : `Bearer ${token}`,
         },
         body: JSON.stringify(filter),
       });
       const data = await res.json();
+      if(!data?.length) {
+        toast.error("No Data found")
+        return
+      }
       renderChartData(data);
     } catch (error) {
+      toast.error(error?.message || "Something went wrong")
     } finally {
       setloading(false);
     }
@@ -85,25 +92,25 @@ const ViewChart = () => {
   }, [lineChartData]);
 
   return (
-    <div className="flex flex-col items-center w-full mt-6">
+    <div className="flex flex-col items-center w-full h-[100vh]">
       {loading && <Loader />}
-      {showChart && (
-        <div className="flex flex-col mt-12 w-full h-[300px] items-center gap-8">
+      { showChart ? (
+        <div className="flex flex-col my-12 relative h-[400px] md:w-[600px] w-full items-center gap-8">
           <BarChart
             chartData={barChartData}
             labels={barChartLabels}
             title={"Features"}
-            legend={"Total Time Spent"}
+            legend={"Total Time Spent (Click on Feature to view it's Timeline)"}
             selectCategory={selectCategory}
           />
           <LineChart
             chartData={lineChartCategoryData}
             labels={lineChartLabels}
             title={`Feature ${currentCategory}`}
-            legend={"Total Time Spent on Day"}
+            legend={"Total Time Spent"}
           />
         </div>
-      )}
+      ) : (!showChart && !loading) ? (<span className="absolute top-1/2 left-1/2 mt-[-50px] ml-[-100px] text-3xl font-semibold">No Data Found!</span>) : <></>}
     </div>
   );
 };

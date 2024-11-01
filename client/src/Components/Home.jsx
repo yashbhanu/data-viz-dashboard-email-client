@@ -4,7 +4,7 @@ import "rsuite/dist/rsuite.min.css";
 import Loader from "./Loader";
 import BarChart from "./BarChart";
 import LineChart from "./LineChart";
-import { copyToClipBoard, generateChartsData } from "../helper";
+import { copyToClipBoard, formatDate, generateChartsData } from "../helper";
 import { toast } from "react-toastify";
 import { useCookies } from "react-cookie";
 
@@ -31,10 +31,11 @@ const Home = () => {
   const [lineChartCategoryData, setlineChartCategoryData] = useState([]);
   const [currentCategory, setcurrentCategory] = useState("");
   const [showChart, setshowChart] = useState(false);
+  const token = localStorage.getItem("token")
   const handleDateChange = (range) => {
-    setDateRange(range);
-    setCookie('startDate', formatDate(range[0]))
-    setCookie('endDate', formatDate(range[1]))
+    setDateRange(range || []);
+    setCookie('startDate', !range ? "" : formatDate(range[0]))
+    setCookie('endDate', !range ? "" : formatDate(range[1]))
     setError("");
   };
 
@@ -57,13 +58,6 @@ const Home = () => {
     setDateRange([])
   };
 
-  const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}/${month}/${day}`;
-  };
-
   const handleSubmit = async (event) => {
     setloading(true);
     event.preventDefault();
@@ -80,10 +74,11 @@ const Home = () => {
         ...(filters.gender && { gender: filters.gender }),
         ...(filters.age && { age: filters.age }),
       };
-      const res = await fetch(`http://localhost:4000/api/feature/`, {
+      const res = await fetch(`${process.env.REACT_APP_SERVER_URL}api/feature/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization" : `Bearer ${token}`,
         },
         body: JSON.stringify(filter),
       });
@@ -94,6 +89,7 @@ const Home = () => {
       }
       renderChartData(data);
     } catch (error) {
+      toast.error(error?.message || "Something went wrong")
     } finally {
       setloading(false);
     }
@@ -115,19 +111,25 @@ const Home = () => {
     setcurrentCategory(categoryName);
   };
 
-  useEffect(() => {
-    console.log({ filters });
-  }, [filters]);
+  const handleShareLink = () => {
+    const link = `${process.env.REACT_APP_CLIENT_URL}view-chart?startDate=${formatDate(
+      dateRange[0]
+    )}&endDate=${formatDate(dateRange[1])}&age=${
+      filters.age
+    }&gender=${filters.gender}&feature=${currentCategory}`;
+    copyToClipBoard(link);
+    toast.success("Link Copied Successfully")
+  }
 
   return (
     <>
-      <div className="flex flex-col items-center w-full mt-6">
+      <div className="flex flex-col items-center justify-center w-full h-full mt-6">
         {loading && <Loader />}
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col items-center border border-gray-300 rounded py-3 px-4 w-3/5"
+          className="flex flex-col items-center border border-gray-300 rounded py-3 px-4 lg:w-3/5 sm:w-4/5 w-full"
         >
-          <div className="flex gap-3 w-full justify-between items-center">
+          <div className="flex gap-3 w-full justify-between items-start">
             <div className="w-1/3">
               <label
                 htmlFor="gender"
@@ -189,7 +191,7 @@ const Home = () => {
           <div className="mt-3 w-full flex gap-3 justify-end">
             <button
               type="submit"
-              className="px-4 bg-[#E54065] py-1 text-white font-medium rounded text-center"
+              className="px-4 bg-primary py-1 text-white font-medium rounded text-center"
             >
               Apply
             </button>
@@ -202,15 +204,7 @@ const Home = () => {
             </button>
             {showChart && (
               <button
-                onClick={() => {
-                  const link = `http://localhost:3000/view-chart?startDate=${formatDate(
-                    dateRange[0]
-                  )}&endDate=${formatDate(dateRange[1])}&age=${
-                    filters.age
-                  }&gender=${filters.gender}&feature=${currentCategory}`;
-                  copyToClipBoard(link);
-                  toast.success("Link Copied Successfully")
-                }}
+                onClick={handleShareLink}
                 type="button"
                 className="px-4 bg-sky-600 py-1 text-white font-medium rounded text-center"
               >
@@ -220,12 +214,12 @@ const Home = () => {
           </div>
         </form>
         {showChart && (
-          <div className="flex mt-12 h-[300px] items-center gap-8 justify-center w-full">
+          <div className="flex flex-col mt-12 h-[300px] md:w-[600px] w-full relative items-center gap-8">
             <BarChart
               chartData={barChartData}
               labels={barChartLabels}
               title={"Features"}
-              legend={"Total Time Spent"}
+              legend={"Total Time Spent (Click on Feature to view it's Timeline)"}
               selectCategory={selectCategory}
             />
             <LineChart

@@ -10,9 +10,10 @@ featureRouter.route("/").post(async (req, res) => {
     if (!startDate || !endDate) {
       throw new Error("Please add Start date and End Date");
     }
+    const startUpdatedDate = new Date(startDate)
     const endUpdatedDate = new Date(endDate)
     const filter = {
-      Day: { $gte: new Date(startDate), $lt: endUpdatedDate.setDate(endUpdatedDate.getDate() + 1)},
+      Day: { $gte: startUpdatedDate.setDate(startUpdatedDate.getDate() + 1), $lt: endUpdatedDate.setDate(endUpdatedDate.getDate() + 2)},
       ...(age && { Age: age }),
       ...(gender && { Gender: gender }),
     };

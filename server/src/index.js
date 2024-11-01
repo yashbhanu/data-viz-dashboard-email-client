@@ -3,6 +3,8 @@ import featureRouter from "./routes/featureRouter.js";
 import dotenv from "dotenv";
 import cors from "cors"
 import { connectToMongo } from "./dbConn.js";
+import userRouter from "./routes/userRouter.js";
+import { authorize } from "./middleware/authenticate.js";
 const app = express();
 const port = 4000;
 
@@ -17,7 +19,8 @@ connectToMongo()
   .then(() => {
     app.use(cors(options));
     app.use(express.json());
-    app.use("/api/feature", featureRouter);
+    app.use("/api/feature", authorize, featureRouter);
+    app.use("/api/auth", userRouter);
     app.get("/", (req, res) => {
       res.send("Welcome to Email Data Viz Dashboard!");
     });
