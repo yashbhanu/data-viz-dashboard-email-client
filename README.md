@@ -80,4 +80,4 @@ Create a .env file in the root of the project and provide the necessary environm
 
   ## Deployment
 
-Check out the live app at [https://data-viz-dashboard-roc8.vercel.app/](https://data-viz-dashboard-roc8.vercel.app/).
+Check out the live app at [https://viz-dashboard-email-client-roc8.vercel.app](https://viz-dashboard-email-client-roc8.vercel.app).
