@@ -46,7 +46,7 @@ Create a .env file in the root of the project and provide the necessary environm
   npm start
   ```
 
-    <b>Run Backend</b>
+<b>Run Backend</b>
 
   ```sh
   cd server
