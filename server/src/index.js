@@ -10,7 +10,7 @@ const port = 4000;
 
 dotenv.config();
 
-const allowedOrigins = ["http://localhost:3000"];
+const allowedOrigins = ["http://localhost:3000", "https://data-viz-dashboard-roc8.vercel.app"];
 const options = {
   origin: allowedOrigins,
 };
