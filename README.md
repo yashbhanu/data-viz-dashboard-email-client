@@ -5,6 +5,10 @@ The given [Dataset](https://docs.google.com/spreadsheets/d/1l7GstWHc69HPV0irSdvo
 A share chart option has been added to share data visualization charts over a URL upon Authentication.
 It's a monorepo where Frontend & Backend are divided into sub-folders client & server respectively.
 
+# Email Client App
+
+The Email client app is to fetch emails with pagination & further view the email Details with filters available to filter out Read, Unread & Favorite Emails.
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed on your system:
