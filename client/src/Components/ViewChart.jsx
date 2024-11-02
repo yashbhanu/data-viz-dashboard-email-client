@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import BarChart from "./BarChart";
 import LineChart from "./LineChart";
 import Loader from "./Loader";
@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 
 const ViewChart = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
 
   const startDate = queryParams.get("startDate");
@@ -92,10 +93,18 @@ const ViewChart = () => {
   }, [lineChartData]);
 
   return (
-    <div className="flex flex-col items-center w-full h-[100vh]">
+    <div className="flex flex-col items-center w-full">
       {loading && <Loader />}
+      <button
+        onClick={() => {
+          navigate("/");
+        }}
+        className="absolute rounded text-center top-4 left-8 bg-secondary text-white px-3 py-1"
+      >
+        Create Chart
+      </button>
       { showChart ? (
-        <div className="flex flex-col my-12 relative h-[400px] md:w-[600px] w-full items-center gap-8">
+        <div className="flex flex-col mt-6 relative md:w-[600px] w-full items-center gap-8">
           <BarChart
             chartData={barChartData}
             labels={barChartLabels}

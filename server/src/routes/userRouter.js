@@ -24,7 +24,6 @@ userRouter.route("/signup").post(async (req, res) => {
     });
     user = user.toObject()
     delete user.password;
-    console.log({user})
     const authToken = jwt.sign({user}, process.env.JWT_SECRET);
     res.status(201).json({authToken})
 

@@ -6,7 +6,6 @@ const featureRouter = express.Router();
 featureRouter.route("/").post(async (req, res) => {
   try {
     const { startDate, endDate, gender, age } = req.body;
-    console.log(req.body)
     if (!startDate || !endDate) {
       throw new Error("Please add Start date and End Date");
     }

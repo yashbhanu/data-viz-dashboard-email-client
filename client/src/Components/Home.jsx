@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
 import Loader from "./Loader";
@@ -214,7 +214,7 @@ const Home = () => {
           </div>
         </form>
         {showChart && (
-          <div className="flex flex-col mt-12 h-[300px] md:w-[600px] w-full relative items-center gap-8">
+          <div className="flex flex-col mt-12 md:w-[600px] w-full relative items-center gap-8">
             <BarChart
               chartData={barChartData}
               labels={barChartLabels}
