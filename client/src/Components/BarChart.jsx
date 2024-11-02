@@ -60,7 +60,7 @@ const BarChart = ({ labels, title, legend, chartData, selectCategory }) => {
         ? (evt.chart.canvas.style.cursor = "pointer")
         : (evt.chart.canvas.style.cursor = "default");
     },
-    maintainAspectRatio: true,
+    // maintainAspectRatio: true,
     responsive: true,
     indexAxis: "y",
     plugins: {

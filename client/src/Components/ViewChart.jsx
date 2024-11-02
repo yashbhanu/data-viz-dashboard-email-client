@@ -84,12 +84,14 @@ const ViewChart = () => {
 
   useEffect(() => {
     handleSubmit();
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
     if (feature) {
       selectCategory(feature);
     }
+    // eslint-disable-next-line
   }, [lineChartData]);
 
   return (

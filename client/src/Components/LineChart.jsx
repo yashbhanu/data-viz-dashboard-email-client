@@ -42,7 +42,7 @@ const LineChart = ({ chartData, labels, title, legend }) => {
   };
 
   const options = {
-    maintainAspectRatio: true,
+    // maintainAspectRatio: true,
     responsive: true,
     plugins: {
       legend: {
