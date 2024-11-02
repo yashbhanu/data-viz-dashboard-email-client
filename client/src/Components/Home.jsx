@@ -127,7 +127,7 @@ const Home = () => {
         {loading && <Loader />}
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col items-center border border-gray-300 rounded py-3 px-4 lg:w-3/5 sm:w-4/5 w-full"
+          className="flex flex-col items-center border border-gray-300 bg-white rounded py-3 px-4 lg:w-3/5 sm:w-4/5 w-full"
         >
           <div className="flex gap-3 w-full justify-between items-start">
             <div className="w-1/3">

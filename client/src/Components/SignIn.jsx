@@ -124,6 +124,9 @@ const SignIn = () => {
             </div>
           </div>
         </div>
+        <button onClick={() => navigate("/email-client")} className="px-3 py-1 bg-accent absolute top-4 right-8 font-medium text-base text-white rounded-md">
+          Go to Email Client
+        </button>
       </section>
     </>
   );

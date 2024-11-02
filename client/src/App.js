@@ -8,14 +8,17 @@ import SignIn from './Components/SignIn';
 import SignUp from './Components/SignUp';
 import ProtectedRoute from './Components/ProtectedRoute';
 import PublicRoute from './Components/PublicRoute';
+import EmailClient from './Components/EmailComponents/EmailClient'
 
 function App() {
   return (
     <div className="App">
       <main className='max-w-screen-2xl mx-auto lg:px-16 lg:py-8 px-4 py-12'>
-        <div className='flex justify-center'>
-          <span className='text-3xl font-semibold text-gray-800'>Data viz Dashboard</span>
-        </div>
+      {window.location.pathname !== '/email-client' && (
+          <div className="flex justify-center">
+            <span className="text-3xl font-semibold text-gray-800">Data viz Dashboard</span>
+          </div>
+        )}
         <BrowserRouter>
           <Routes>
             <Route element={<ProtectedRoute />}>
@@ -25,6 +28,7 @@ function App() {
             <Route element={<PublicRoute />}>
               <Route path='/signin' element={<SignIn />} />
               <Route path='/signup' element={<SignUp />} />
+              <Route path='/email-client' element={<EmailClient /> } />
             </Route>
           </Routes>
         </BrowserRouter>

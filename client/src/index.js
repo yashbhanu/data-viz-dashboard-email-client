@@ -1,15 +1,22 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import { CookiesProvider } from 'react-cookie';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import { CookiesProvider } from "react-cookie";
+import { Provider } from "react-redux";
+import { persistor, store } from './redux/store';
+import { PersistGate } from "redux-persist/integration/react";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-    <CookiesProvider defaultSetOptions={{ path: '/' }}>
-      <App />
-    </CookiesProvider>
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <CookiesProvider defaultSetOptions={{ path: "/" }}>
+        <App />
+      </CookiesProvider>
+    </PersistGate>
+  </Provider>
 );
 
 // If you want to start measuring performance in your app, pass a function

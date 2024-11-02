@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import Loader from "./Loader";
 
 const SignUp = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const location = useLocation();
   const queryString = location.search;
   const [loading, setloading] = useState(false);
@@ -25,13 +25,16 @@ const SignUp = () => {
     try {
       setloading(true);
       e.preventDefault();
-      const res = await fetch(`${process.env.REACT_APP_SERVER_URL}api/auth/signup/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userDetails),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}api/auth/signup/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userDetails),
+        }
+      );
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err?.message);
@@ -39,8 +42,8 @@ const SignUp = () => {
       const data = await res.json();
       if (data?.authToken) {
         localStorage.setItem("token", data?.authToken);
-        if(queryString) {
-          navigate(`/view-chart${queryString}`)
+        if (queryString) {
+          navigate(`/view-chart${queryString}`);
         } else {
           navigate("/");
         }
@@ -144,6 +147,12 @@ const SignUp = () => {
           </div>
         </div>
       </section>
+      <button
+        onClick={() => navigate("/email-client")}
+        className="px-3 py-1 bg-accent absolute top-4 right-8 font-medium text-base text-white rounded-md"
+      >
+        Go to Email Client
+      </button>
     </>
   );
 };
