@@ -21,7 +21,6 @@ Before you begin, ensure you have the following installed on your system:
 
 ```sh
   git clone https://github.com/yashbhanu/data-viz-dashboard.git
-  
   ```
 
   <b>Run Frontend</b>
