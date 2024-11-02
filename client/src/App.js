@@ -28,8 +28,8 @@ function App() {
             <Route element={<PublicRoute />}>
               <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignUp />} />
-              <Route path="/email-client" element={<EmailClient />} />
             </Route>
+            <Route path="/email-client" element={<EmailClient />} />
           </Routes>
         </BrowserRouter>
       </main>
