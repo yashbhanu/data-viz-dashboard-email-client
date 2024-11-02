@@ -22,7 +22,7 @@ connectToMongo()
     app.use("/api/feature", authorize, featureRouter);
     app.use("/api/auth", userRouter);
     app.get("/", (req, res) => {
-      res.send("Welcome to Email Data Viz Dashboard!");
+      res.send("Welcome to Data Viz Dashboard!");
     });
 
     app.listen(port, () => {
